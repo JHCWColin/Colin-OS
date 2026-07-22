@@ -15,6 +15,7 @@ apt-get install -y \
   debootstrap \
   xorriso \
   squashfs-tools \
+  isolinux \
   syslinux \
   syslinux-common \
   grub-pc-bin \

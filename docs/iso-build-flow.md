@@ -140,7 +140,7 @@ Implementation note:
 
 - On Ubuntu 24.04, the repository `live-build` package does not expose the newer `--image-name` switch. Colin OS therefore renames the generated default `live-image-amd64.hybrid.iso` artifact after `lb build` completes.
 - On Ubuntu 24.04, the Ubuntu-mode `live-build` defaults can still emit the obsolete syslinux theme value `ubuntu-oneiric`. Colin OS rewrites the generated `LB_SYSLINUX_THEME` to `live-build` after `lb config` so `lb build` does not request removed packages from the Noble archive.
-- On Ubuntu 24.04, the packaged `live-build` syslinux stage can still expect legacy `/root/isolinux/*` paths. Colin OS prepares compatibility symlinks to the current `/usr/lib` syslinux file locations before starting `lb build`.
+- On Ubuntu 24.04, the packaged `live-build` syslinux stage can still expect legacy `/root/isolinux/*` paths. Colin OS prepares compatibility symlinks before starting `lb build`, using `live-build` bootloader assets first and `isolinux` or `syslinux` package files as fallbacks.
 
 ## WSL2 Host Considerations
 
