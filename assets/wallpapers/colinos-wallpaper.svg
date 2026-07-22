@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#06121f"/>
+      <stop offset="55%" stop-color="#0b1b2a"/>
+      <stop offset="100%" stop-color="#040a10"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#00c2ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#2bf0b5" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <g opacity="0.18" stroke="#4db8d3" stroke-width="1">
+    <path d="M0 140H1920"/>
+    <path d="M0 340H1920"/>
+    <path d="M0 540H1920"/>
+    <path d="M0 740H1920"/>
+    <path d="M0 940H1920"/>
+    <path d="M180 0V1080"/>
+    <path d="M580 0V1080"/>
+    <path d="M980 0V1080"/>
+    <path d="M1380 0V1080"/>
+    <path d="M1780 0V1080"/>
+  </g>
+  <circle cx="1540" cy="220" r="240" fill="#00c2ff" opacity="0.08"/>
+  <circle cx="310" cy="840" r="320" fill="#2bf0b5" opacity="0.05"/>
+  <path fill="none" stroke="url(#accent)" stroke-width="18" d="M660 744 960 252l299 492"/>
+  <path fill="none" stroke="#d8efff" stroke-width="9" opacity="0.8" d="M745 744h431"/>
+  <g transform="translate(196 176)">
+    <rect width="220" height="220" rx="44" fill="#08131f" opacity="0.92"/>
+    <path fill="url(#accent)" d="M110 18 41 58v94l69 40 69-40V58l-69-40Zm0 20 51 29v76l-51 29-51-29V67l51-29Z"/>
+    <path fill="#e6f2ff" d="M130 74c-7-6-14-9-24-9-21 0-38 16-38 39s17 39 38 39c10 0 18-3 25-10l-11-11c-4 3-8 5-13 5-11 0-20-9-20-23s9-23 20-23c5 0 10 1 13 5l10-12Z"/>
+  </g>
+  <text x="196" y="476" fill="#e6f2ff" font-size="74" font-family="Noto Sans, DejaVu Sans, sans-serif" font-weight="700">Colin OS</text>
+  <text x="196" y="534" fill="#8ca9bd" font-size="28" font-family="Noto Sans, DejaVu Sans, sans-serif">Ubuntu 24.04 LTS based developer desktop</text>
+</svg>

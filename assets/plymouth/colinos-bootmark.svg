@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120">
+  <defs>
+    <linearGradient id="g" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#00c2ff"/>
+      <stop offset="100%" stop-color="#2bf0b5"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="120" rx="24" fill="#08131f"/>
+  <path fill="url(#g)" d="M95 18 46 46v56l49 28 49-28V46L95 18Zm0 14 36 21v42l-36 21-36-21V53l36-21Z"/>
+  <path fill="#e6f2ff" d="M111 56c-5-4-10-6-17-6-15 0-27 12-27 28s12 28 27 28c7 0 13-2 18-7l-8-8c-2 2-5 3-9 3-8 0-14-6-14-16s6-16 14-16c4 0 7 1 9 3l7-9Z"/>
+  <text x="160" y="72" fill="#e6f2ff" font-size="24" font-family="Noto Sans, DejaVu Sans, sans-serif" font-weight="700">Colin OS</text>

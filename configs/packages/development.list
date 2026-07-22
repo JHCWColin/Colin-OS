@@ -1,0 +1,13 @@
+# Development tools available in Ubuntu 24.04 official repositories
+git
+git-lfs
+build-essential
+curl
+wget
+python3
+python3-pip
+python3-pyqt6
+nodejs
+npm
+openjdk-21-jdk
+ffmpeg

@@ -1,0 +1,8 @@
+# Hardware enablement from Ubuntu official repositories only
+network-manager
+bluedevil
+bluez
+wireplumber
+pipewire-audio
+firmware-sof-signed
+linux-firmware

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Colin Toolbox
+Comment=Developer diagnostics for Colin OS
+Exec=colin-toolbox
+Icon=applications-development
+Terminal=false
+Categories=Development;Utility;
+StartupNotify=true

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Colin OS
+Description=Colin OS placeholder Plymouth theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/colinos
+ScriptFile=/usr/share/plymouth/themes/colinos/colinos.script

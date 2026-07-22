@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+if command -v update-alternatives >/dev/null 2>&1; then
+  update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth \
+    /usr/share/plymouth/themes/colinos/colinos.plymouth 150 || true
+fi
+
+if command -v update-initramfs >/dev/null 2>&1; then
+  update-initramfs -u || true
+fi

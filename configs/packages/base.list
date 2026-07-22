@@ -1,0 +1,10 @@
+# Base desktop runtime and session components
+kde-plasma-desktop
+sddm
+plasma-nm
+plasma-pa
+systemsettings
+dolphin
+konsole
+ark
+plasma-discover

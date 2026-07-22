@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Colin Welcome
+Comment=First-run welcome experience for Colin OS
+Exec=colin-welcome
+Icon=colinos
+Terminal=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel

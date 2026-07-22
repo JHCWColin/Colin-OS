@@ -1,0 +1,8 @@
+[Desktops]
+Number=1
+
+[NightColor]
+Active=true
+
+[Windows]
+BorderlessMaximizedWindows=true

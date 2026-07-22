@@ -1,0 +1,61 @@
+# Colin OS package manifest for Ubuntu 24.04 LTS (noble)
+# Policy: prefer Ubuntu official repositories only.
+
+# Core desktop
+kde-plasma-desktop
+sddm
+plasma-nm
+plasma-pa
+systemsettings
+dolphin
+konsole
+ark
+plasma-discover
+
+# Hardware, connectivity, and firmware
+network-manager
+bluedevil
+bluez
+wireplumber
+pipewire-audio
+firmware-sof-signed
+linux-firmware
+
+# Development
+git
+git-lfs
+build-essential
+curl
+wget
+python3
+python3-pip
+python3-pyqt6
+nodejs
+npm
+openjdk-21-jdk
+ffmpeg
+
+# Browser
+firefox
+
+# Multimedia and graphics
+vlc
+gimp
+krita
+imagemagick
+
+# System tools
+htop
+btop
+neofetch
+gparted
+timeshift
+
+# Archive tools
+p7zip-full
+zip
+unzip
+
+# Colin OS packaging helpers
+calamares
+packagekit-tools

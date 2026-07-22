@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+
+chmod 0755 /usr/local/bin/colin-welcome
+chmod 0755 /usr/local/bin/colin-settings
+chmod 0755 /usr/local/bin/colin-update-center
+chmod 0755 /usr/local/bin/colin-toolbox

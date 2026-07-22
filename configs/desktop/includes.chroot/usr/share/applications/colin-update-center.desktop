@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Colin Update Center
+Comment=Update entry point for Colin OS
+Exec=colin-update-center
+Icon=system-software-update
+Terminal=false
+Categories=System;Settings;
+StartupNotify=true

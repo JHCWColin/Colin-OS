@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Colin Welcome
+Comment=Welcome utility for Colin OS
+Exec=colin-welcome
+Icon=colinos
+Terminal=false
+Categories=Utility;System;
+StartupNotify=true

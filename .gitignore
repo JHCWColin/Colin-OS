@@ -1,0 +1,29 @@
+# Build outputs
+out/
+dist/
+tmp/
+work/
+cache/
+
+# ISO artifacts
+*.iso
+*.img
+*.squashfs
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/

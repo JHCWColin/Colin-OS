@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title>Colin OS Logo</title>
+  <defs>
+    <linearGradient id="g" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#00c2ff"/>
+      <stop offset="100%" stop-color="#2bf0b5"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#08131f"/>
+  <path fill="url(#g)" d="M128 28 48 74v108l80 46 80-46V74l-80-46Zm0 24 59 34v84l-59 34-59-34V86l59-34Z"/>
+  <path fill="#e6f2ff" d="M151 92c-8-7-17-11-29-11-26 0-46 20-46 47s20 47 46 47c12 0 22-4 30-12l-13-14c-4 4-10 6-16 6-13 0-24-11-24-27s11-27 24-27c7 0 12 2 16 6l12-15Z"/>
+</svg>
