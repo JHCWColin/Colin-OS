@@ -84,6 +84,8 @@ For convenience, the repository now includes:
 
 - [build/install-deps.sh](/D:/Colin-OS/build/install-deps.sh)
 
+On Ubuntu 24.04 runners, that dependency installer also patches the installed `live-build` syslinux script when it still contains the legacy `/root/isolinux` source path.
+
 ## Usage
 
 Standard build:
@@ -146,6 +148,7 @@ This ensures the Git repository remains clean while still keeping local build ou
 - The scripts assume Ubuntu 24.04 compatible `live-build` tooling is already installed.
 - On Ubuntu 24.04, `live-build` in `--mode ubuntu` can still generate `LB_SYSLINUX_THEME="ubuntu-oneiric"`, which makes `lb build` try to install `syslinux-themes-ubuntu-oneiric` and `gfxboot-theme-ubuntu`. The wrapper now rewrites that generated setting to `live-build` before `lb build`.
 - On Ubuntu 24.04 runners, `live-build` can still expect `/root/isolinux/isolinux.bin` and `/root/isolinux/vesamenu.c32`. The wrapper now copies compatibility files into both the host `/root/isolinux` path and `config/includes.chroot/root/isolinux`, preferring the `live-build` bootloader assets and falling back to `isolinux` and `syslinux` package paths.
+- On Ubuntu 24.04 runners, the packaged `live-build` syslinux helper itself may still contain a legacy `/root/isolinux` source path. `build/install-deps.sh` patches that helper in place after package installation so it uses the script's resolved bootloader source directory instead.
 - Calamares is still only a package placeholder and the ISO build currently disables the installer stage until real integration is implemented.
 - Desktop branding and Colin OS app payloads are staged generically because the actual content is not implemented yet.
 - The build assumes the branding assets remain SVG-first placeholders until the ISO validation phase confirms all boot and login surfaces consume them correctly.
