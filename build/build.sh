@@ -18,6 +18,7 @@ Environment variables:
   COLIN_VERSION   Override release version. Defaults to Git tag or 0.1.0-dev.
   COLIN_CLEAN     Set to 0 to skip workspace cleanup. Default: 1
   COLIN_JOBS      Parallel job hint for compatible tools. Default: detected CPU count
+  COLIN_SYSLINUX_THEME  Override the syslinux theme written into live-build config. Default: live-build
 EOF
 }
 

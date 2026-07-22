@@ -28,6 +28,23 @@ load_build_env() {
   source "${BUILD_ENV_FILE}"
 }
 
+apply_syslinux_theme_workaround() {
+  local syslinux_theme="${COLIN_SYSLINUX_THEME:-live-build}"
+  local config_file
+
+  for config_file in \
+    "${WORKSPACE_DIR}/config/common" \
+    "${WORKSPACE_DIR}/config/binary"; do
+    [[ -f "${config_file}" ]] || continue
+
+    if grep -q '^LB_SYSLINUX_THEME=' "${config_file}"; then
+      sed -i "s/^LB_SYSLINUX_THEME=.*/LB_SYSLINUX_THEME=\"${syslinux_theme//\//\\/}\"/" "${config_file}"
+    else
+      printf '\nLB_SYSLINUX_THEME="%s"\n' "${syslinux_theme}" >> "${config_file}"
+    fi
+  done
+}
+
 reset_saved_lb_config() {
   rm -rf \
     "${WORKSPACE_DIR}/config/bootstrap" \
@@ -77,6 +94,8 @@ main() {
     --iso-publisher "Colin OS Project" \
     --iso-volume "${image_name}" \
     | tee "${LOG_DIR}/lb-config-${COLIN_VERSION}.log"
+
+  apply_syslinux_theme_workaround
 
   lb build 2>&1 | tee "${build_log}"
 

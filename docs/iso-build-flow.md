@@ -139,6 +139,7 @@ This keeps local and CI builds consistent and makes release provenance obvious.
 Implementation note:
 
 - On Ubuntu 24.04, the repository `live-build` package does not expose the newer `--image-name` switch. Colin OS therefore renames the generated default `live-image-amd64.hybrid.iso` artifact after `lb build` completes.
+- On Ubuntu 24.04, the Ubuntu-mode `live-build` defaults can still emit the obsolete syslinux theme value `ubuntu-oneiric`. Colin OS rewrites the generated `LB_SYSLINUX_THEME` to `live-build` after `lb config` so `lb build` does not request removed packages from the Noble archive.
 
 ## WSL2 Host Considerations
 

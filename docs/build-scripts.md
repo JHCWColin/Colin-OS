@@ -119,6 +119,12 @@ Override detected parallelism:
 COLIN_JOBS=20 ./build/build.sh
 ```
 
+Override the syslinux theme written into generated `live-build` config:
+
+```bash
+COLIN_SYSLINUX_THEME=live-build ./build/build.sh
+```
+
 ## Output Layout
 
 Generated files are intentionally kept outside tracked source paths:
@@ -135,6 +141,7 @@ This ensures the Git repository remains clean while still keeping local build ou
 ## Current Limitations
 
 - The scripts assume Ubuntu 24.04 compatible `live-build` tooling is already installed.
+- On Ubuntu 24.04, `live-build` in `--mode ubuntu` can still generate `LB_SYSLINUX_THEME="ubuntu-oneiric"`, which makes `lb build` try to install `syslinux-themes-ubuntu-oneiric` and `gfxboot-theme-ubuntu`. The wrapper now rewrites that generated setting to `live-build` before `lb build`.
 - Calamares is still only a package placeholder and the ISO build currently disables the installer stage until real integration is implemented.
 - Desktop branding and Colin OS app payloads are staged generically because the actual content is not implemented yet.
 - The build assumes the branding assets remain SVG-first placeholders until the ISO validation phase confirms all boot and login surfaces consume them correctly.
