@@ -15,6 +15,8 @@ apt-get install -y \
   debootstrap \
   xorriso \
   squashfs-tools \
+  syslinux \
+  syslinux-common \
   grub-pc-bin \
   grub-efi-amd64-bin \
   mtools \

@@ -45,6 +45,40 @@ apply_syslinux_theme_workaround() {
   done
 }
 
+prepare_syslinux_compat_paths() {
+  local compat_dir="/root/isolinux"
+  local isolinux_bin=""
+  local vesamenu_module=""
+
+  for candidate in \
+    "/usr/lib/ISOLINUX/isolinux.bin" \
+    "/usr/lib/syslinux/isolinux.bin"; do
+    if [[ -f "${candidate}" ]]; then
+      isolinux_bin="${candidate}"
+      break
+    fi
+  done
+
+  for candidate in \
+    "/usr/lib/syslinux/modules/bios/vesamenu.c32" \
+    "/usr/lib/syslinux/vesamenu.c32"; do
+    if [[ -f "${candidate}" ]]; then
+      vesamenu_module="${candidate}"
+      break
+    fi
+  done
+
+  if [[ -z "${isolinux_bin}" || -z "${vesamenu_module}" ]]; then
+    printf 'Unable to resolve syslinux compatibility files on the host.\n' >&2
+    printf 'Expected isolinux.bin and vesamenu.c32 from the syslinux packages.\n' >&2
+    exit 1
+  fi
+
+  mkdir -p "${compat_dir}"
+  ln -sf "${isolinux_bin}" "${compat_dir}/isolinux.bin"
+  ln -sf "${vesamenu_module}" "${compat_dir}/vesamenu.c32"
+}
+
 reset_saved_lb_config() {
   rm -rf \
     "${WORKSPACE_DIR}/config/bootstrap" \
@@ -96,6 +130,7 @@ main() {
     | tee "${LOG_DIR}/lb-config-${COLIN_VERSION}.log"
 
   apply_syslinux_theme_workaround
+  prepare_syslinux_compat_paths
 
   lb build 2>&1 | tee "${build_log}"
 
