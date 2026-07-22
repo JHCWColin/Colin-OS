@@ -76,7 +76,6 @@ main() {
     --iso-application "Colin OS" \
     --iso-publisher "Colin OS Project" \
     --iso-volume "${image_name}" \
-    --image-name "${image_name}" \
     | tee "${LOG_DIR}/lb-config-${COLIN_VERSION}.log"
 
   lb build 2>&1 | tee "${build_log}"

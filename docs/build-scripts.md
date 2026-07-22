@@ -51,6 +51,8 @@ It then moves the generated ISO into:
 
 - `out/iso/`
 
+On Ubuntu 24.04 specifically, `live-build` emits its default filename and the script renames it afterward to the Colin OS release filename. This is deliberate compatibility handling for the Noble package version.
+
 It also writes checksums and build logs into:
 
 - `out/iso/`

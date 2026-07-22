@@ -136,6 +136,10 @@ Example:
 
 This keeps local and CI builds consistent and makes release provenance obvious.
 
+Implementation note:
+
+- On Ubuntu 24.04, the repository `live-build` package does not expose the newer `--image-name` switch. Colin OS therefore renames the generated default `live-image-amd64.hybrid.iso` artifact after `lb build` completes.
+
 ## WSL2 Host Considerations
 
 For the specified development host:
