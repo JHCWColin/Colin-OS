@@ -46,8 +46,9 @@ apply_syslinux_theme_workaround() {
 }
 
 prepare_syslinux_compat_paths() {
-  local compat_dir="/root/isolinux"
-  mkdir -p "${compat_dir}"
+  local host_compat_dir="/root/isolinux"
+  local chroot_compat_dir="${WORKSPACE_DIR}/config/includes.chroot/root/isolinux"
+  mkdir -p "${host_compat_dir}" "${chroot_compat_dir}"
 
   local source_dir=""
   for candidate in \
@@ -62,7 +63,8 @@ prepare_syslinux_compat_paths() {
 
   if [[ -n "${source_dir}" ]]; then
     while IFS= read -r -d '' path; do
-      ln -sf "${path}" "${compat_dir}/$(basename "${path}")"
+      cp -f "${path}" "${host_compat_dir}/$(basename "${path}")"
+      cp -f "${path}" "${chroot_compat_dir}/$(basename "${path}")"
     done < <(find "${source_dir}" -maxdepth 1 -type f -print0)
   fi
 
@@ -71,7 +73,8 @@ prepare_syslinux_compat_paths() {
     "/usr/lib/ISOLINUX/isolinux.bin" \
     "/usr/lib/syslinux/isolinux.bin"; do
     if [[ -f "${candidate}" ]]; then
-      ln -sf "${candidate}" "${compat_dir}/isolinux.bin"
+      cp -f "${candidate}" "${host_compat_dir}/isolinux.bin"
+      cp -f "${candidate}" "${chroot_compat_dir}/isolinux.bin"
       break
     fi
   done
@@ -81,12 +84,13 @@ prepare_syslinux_compat_paths() {
     "/usr/lib/syslinux/modules/bios/vesamenu.c32" \
     "/usr/lib/syslinux/vesamenu.c32"; do
     if [[ -f "${candidate}" ]]; then
-      ln -sf "${candidate}" "${compat_dir}/vesamenu.c32"
+      cp -f "${candidate}" "${host_compat_dir}/vesamenu.c32"
+      cp -f "${candidate}" "${chroot_compat_dir}/vesamenu.c32"
       break
     fi
   done
 
-  if [[ ! -f "${compat_dir}/isolinux.bin" || ! -f "${compat_dir}/vesamenu.c32" ]]; then
+  if [[ ! -f "${host_compat_dir}/isolinux.bin" || ! -f "${host_compat_dir}/vesamenu.c32" ]]; then
     printf 'Unable to resolve syslinux compatibility files on the host.\n' >&2
     printf 'Checked live-build bootloader assets, isolinux, and syslinux package paths.\n' >&2
     exit 1
