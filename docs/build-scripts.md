@@ -10,6 +10,8 @@ Colin OS currently uses three top-level build scripts:
 
 The scripts are written for Ubuntu shell execution inside WSL2 or a native Ubuntu environment.
 
+Because the repository may be edited from Windows, the build pipeline does not rely on Git preserving executable mode bits for shell scripts. The top-level entrypoint invokes child scripts with `bash`, and the packaging step reapplies executable permissions for staged helper scripts and `live-build` hooks.
+
 ## Script Roles
 
 ### `build/build.sh`

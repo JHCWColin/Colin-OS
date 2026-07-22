@@ -138,6 +138,20 @@ stage_live_build_inputs() {
   copy_tree_contents "${BRANDING_HOOK_SOURCE_DIR}" "${WORKSPACE_DIR}/config/hooks"
 }
 
+fix_permissions() {
+  local file
+
+  for file in \
+    "${WORKSPACE_DIR}/config/hooks/"*.hook.chroot \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-welcome" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-settings" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-update-center" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-toolbox"; do
+    [[ -e "${file}" ]] || continue
+    chmod 0755 "${file}"
+  done
+}
+
 main() {
   local version
   version="$(resolve_version)"
@@ -156,9 +170,9 @@ main() {
   write_metadata "${version}"
   stage_live_build_inputs
   stage_branding_assets
-
   copy_tree_contents "${ASSETS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/assets"
   copy_tree_contents "${APPS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/apps"
+  fix_permissions
 
   cat > "${WORKSPACE_DIR}/build.env" <<EOF
 COLIN_VERSION=${version}

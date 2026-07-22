@@ -46,5 +46,5 @@ fi
 
 export COLIN_CLEAN="${COLIN_CLEAN:-1}"
 
-"${SCRIPT_DIR}/package.sh"
-"${SCRIPT_DIR}/create-iso.sh"
+bash "${SCRIPT_DIR}/package.sh"
+bash "${SCRIPT_DIR}/create-iso.sh"
