@@ -362,6 +362,7 @@ reset_saved_lb_config() {
 main() {
   require_command lb
   require_command sha256sum
+  require_command isohybrid
 
   load_build_env
 

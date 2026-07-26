@@ -188,6 +188,7 @@ apt-get update
 apt-get install -y \
   isolinux \
   syslinux \
+  syslinux-utils \
   syslinux-common
 
 verify_syslinux_installation
