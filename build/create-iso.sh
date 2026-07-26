@@ -105,51 +105,116 @@ prepare_syslinux_compat_paths() {
   local chroot_compat_dir="${WORKSPACE_DIR}/config/includes.chroot/root/isolinux"
   mkdir -p "${host_compat_dir}" "${chroot_compat_dir}"
 
-  local source_dir=""
-  for candidate in \
-    "/usr/share/live/build/bootloaders/isolinux" \
-    "/usr/lib/ISOLINUX" \
-    "/usr/lib/syslinux/modules/bios"; do
-    if [[ -d "${candidate}" ]]; then
-      source_dir="${candidate}"
-      break
-    fi
-  done
+  printf 'Searching for syslinux/isolinux files...\n'
 
-  if [[ -n "${source_dir}" ]]; then
-    while IFS= read -r -d '' path; do
-      cp -f "${path}" "${host_compat_dir}/$(basename "${path}")"
-      cp -f "${path}" "${chroot_compat_dir}/$(basename "${path}")"
-    done < <(find "${source_dir}" -maxdepth 1 -type f -print0)
-  fi
-
+  # Find isolinux.bin
+  local isolinux_bin_found=0
   for candidate in \
     "/usr/share/live/build/bootloaders/isolinux/isolinux.bin" \
     "/usr/lib/ISOLINUX/isolinux.bin" \
-    "/usr/lib/syslinux/isolinux.bin"; do
+    "/usr/lib/syslinux/isolinux.bin" \
+    "/usr/lib/syslinux/mbr/isolinux.bin"; do
     if [[ -f "${candidate}" ]]; then
+      printf 'Found isolinux.bin at: %s\n' "${candidate}"
       cp -f "${candidate}" "${host_compat_dir}/isolinux.bin"
       cp -f "${candidate}" "${chroot_compat_dir}/isolinux.bin"
+      isolinux_bin_found=1
       break
     fi
   done
 
+  # If still not found, use dpkg to locate it
+  if [[ "${isolinux_bin_found}" -eq 0 ]]; then
+    printf 'Standard paths failed, searching via dpkg...\n'
+    local dpkg_path
+    dpkg_path="$(dpkg -L isolinux 2>/dev/null | grep -m1 'isolinux\.bin$' || true)"
+    if [[ -n "${dpkg_path}" && -f "${dpkg_path}" ]]; then
+      printf 'Found isolinux.bin via dpkg at: %s\n' "${dpkg_path}"
+      cp -f "${dpkg_path}" "${host_compat_dir}/isolinux.bin"
+      cp -f "${dpkg_path}" "${chroot_compat_dir}/isolinux.bin"
+      isolinux_bin_found=1
+    fi
+  fi
+
+  # Find vesamenu.c32
+  local vesamenu_found=0
   for candidate in \
     "/usr/share/live/build/bootloaders/isolinux/vesamenu.c32" \
     "/usr/lib/syslinux/modules/bios/vesamenu.c32" \
-    "/usr/lib/syslinux/vesamenu.c32"; do
+    "/usr/lib/syslinux/vesamenu.c32" \
+    "/usr/lib/SYSLINUX/vesamenu.c32"; do
     if [[ -f "${candidate}" ]]; then
+      printf 'Found vesamenu.c32 at: %s\n' "${candidate}"
       cp -f "${candidate}" "${host_compat_dir}/vesamenu.c32"
       cp -f "${candidate}" "${chroot_compat_dir}/vesamenu.c32"
+      vesamenu_found=1
       break
     fi
   done
 
-  if [[ ! -f "${host_compat_dir}/isolinux.bin" || ! -f "${host_compat_dir}/vesamenu.c32" ]]; then
-    printf 'Unable to resolve syslinux compatibility files on the host.\n' >&2
-    printf 'Checked live-build bootloader assets, isolinux, and syslinux package paths.\n' >&2
+  # If still not found, use dpkg to locate it
+  if [[ "${vesamenu_found}" -eq 0 ]]; then
+    printf 'Standard paths failed, searching via dpkg...\n'
+    local dpkg_path
+    dpkg_path="$(dpkg -L syslinux-common 2>/dev/null | grep -m1 'vesamenu\.c32$' || true)"
+    if [[ -n "${dpkg_path}" && -f "${dpkg_path}" ]]; then
+      printf 'Found vesamenu.c32 via dpkg at: %s\n' "${dpkg_path}"
+      cp -f "${dpkg_path}" "${host_compat_dir}/vesamenu.c32"
+      cp -f "${dpkg_path}" "${chroot_compat_dir}/vesamenu.c32"
+      vesamenu_found=1
+    fi
+  fi
+
+  # Copy all other necessary syslinux modules
+  local source_dir=""
+  for candidate in \
+    "/usr/share/live/build/bootloaders/isolinux" \
+    "/usr/lib/syslinux/modules/bios" \
+    "/usr/lib/ISOLINUX"; do
+    if [[ -d "${candidate}" ]]; then
+      printf 'Copying additional modules from: %s\n' "${candidate}"
+      source_dir="${candidate}"
+      while IFS= read -r -d '' path; do
+        local basename_file
+        basename_file="$(basename "${path}")"
+        # Skip if already copied
+        [[ -f "${host_compat_dir}/${basename_file}" ]] && continue
+        cp -f "${path}" "${host_compat_dir}/${basename_file}"
+        cp -f "${path}" "${chroot_compat_dir}/${basename_file}"
+      done < <(find "${candidate}" -maxdepth 1 -type f \( -name '*.c32' -o -name '*.bin' \) -print0)
+      break
+    fi
+  done
+
+  # Final verification
+  if [[ ! -f "${host_compat_dir}/isolinux.bin" ]]; then
+    printf 'ERROR: isolinux.bin not found after exhaustive search.\n' >&2
+    printf 'Searched paths:\n' >&2
+    printf '  - /usr/share/live/build/bootloaders/isolinux/\n' >&2
+    printf '  - /usr/lib/ISOLINUX/\n' >&2
+    printf '  - /usr/lib/syslinux/\n' >&2
+    printf '  - dpkg -L isolinux\n' >&2
+    printf '\nAvailable files in /usr/lib:\n' >&2
+    find /usr/lib -name 'isolinux.bin' 2>/dev/null || printf '  (none found)\n' >&2
     exit 1
   fi
+
+  if [[ ! -f "${host_compat_dir}/vesamenu.c32" ]]; then
+    printf 'ERROR: vesamenu.c32 not found after exhaustive search.\n' >&2
+    printf 'Searched paths:\n' >&2
+    printf '  - /usr/share/live/build/bootloaders/isolinux/\n' >&2
+    printf '  - /usr/lib/syslinux/modules/bios/\n' >&2
+    printf '  - /usr/lib/syslinux/\n' >&2
+    printf '  - dpkg -L syslinux-common\n' >&2
+    printf '\nAvailable files in /usr/lib:\n' >&2
+    find /usr/lib -name 'vesamenu.c32' 2>/dev/null || printf '  (none found)\n' >&2
+    exit 1
+  fi
+
+  printf 'Successfully prepared syslinux compatibility paths:\n'
+  printf '  - %s/isolinux.bin\n' "${host_compat_dir}"
+  printf '  - %s/vesamenu.c32\n' "${host_compat_dir}"
+  ls -lh "${host_compat_dir}"
 }
 
 reset_saved_lb_config() {

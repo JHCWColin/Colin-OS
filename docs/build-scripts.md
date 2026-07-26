@@ -84,7 +84,7 @@ For convenience, the repository now includes:
 
 - [build/install-deps.sh](/D:/Colin-OS/build/install-deps.sh)
 
-On Ubuntu 24.04 runners, that dependency installer scans the installed `live-build` syslinux helpers and patches any remaining legacy `/root/isolinux` source paths before the build starts.
+On Ubuntu 24.04 runners, that dependency installer first stages `/root/isolinux` from the installed `isolinux` and `syslinux` packages, then scans the installed `live-build` syslinux helpers and patches any remaining legacy `/root/isolinux` source paths before the build starts.
 
 ## Usage
 
