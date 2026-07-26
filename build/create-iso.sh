@@ -43,6 +43,128 @@ resolve_live_build_isolinux_source_dir() {
   printf '%s\n' '${_SOURCE}'
 }
 
+resolve_live_build_isolinux_template_dir() {
+  local candidate
+
+  for candidate in \
+    "/usr/share/live/build/bootloaders/isolinux" \
+    "/usr/lib/live/build/bootloaders/isolinux"; do
+    if [[ -d "${candidate}" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+
+  printf 'Unable to locate live-build isolinux template directory.\n' >&2
+  exit 1
+}
+
+find_syslinux_asset() {
+  local asset_name="$1"
+  local candidate
+  local dpkg_package=""
+  local dpkg_pattern=""
+
+  case "${asset_name}" in
+    isolinux.bin)
+      for candidate in \
+        "/usr/share/live/build/bootloaders/isolinux/isolinux.bin" \
+        "/usr/lib/ISOLINUX/isolinux.bin" \
+        "/usr/lib/syslinux/isolinux.bin" \
+        "/usr/lib/syslinux/mbr/isolinux.bin"; do
+        if [[ -f "${candidate}" ]]; then
+          printf '%s\n' "${candidate}"
+          return 0
+        fi
+      done
+
+      dpkg_package="isolinux"
+      dpkg_pattern='isolinux\.bin$'
+      ;;
+
+    vesamenu.c32)
+      for candidate in \
+        "/usr/share/live/build/bootloaders/isolinux/vesamenu.c32" \
+        "/usr/lib/syslinux/modules/bios/vesamenu.c32" \
+        "/usr/lib/syslinux/vesamenu.c32" \
+        "/usr/lib/SYSLINUX/vesamenu.c32"; do
+        if [[ -f "${candidate}" ]]; then
+          printf '%s\n' "${candidate}"
+          return 0
+        fi
+      done
+
+      dpkg_package="syslinux-common"
+      dpkg_pattern='vesamenu\.c32$'
+      ;;
+
+    *)
+      printf 'Unsupported syslinux asset lookup: %s\n' "${asset_name}" >&2
+      return 1
+      ;;
+  esac
+
+  if command -v dpkg >/dev/null 2>&1; then
+    local dpkg_path
+    dpkg_path="$(dpkg -L "${dpkg_package}" 2>/dev/null | grep -m1 "${dpkg_pattern}" || true)"
+    if [[ -n "${dpkg_path}" && -f "${dpkg_path}" ]]; then
+      printf '%s\n' "${dpkg_path}"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+prepare_local_syslinux_bootloader_dir() {
+  local template_dir
+  local bootloader_dir="${WORKSPACE_DIR}/config/bootloaders/isolinux"
+  local candidate
+
+  template_dir="$(resolve_live_build_isolinux_template_dir)"
+
+  rm -rf "${bootloader_dir}"
+  mkdir -p "${bootloader_dir}"
+
+  printf 'Preparing local live-build isolinux bootloader dir from: %s\n' "${template_dir}"
+
+  while IFS= read -r -d '' candidate; do
+    local base_name
+    base_name="$(basename "${candidate}")"
+
+    case "${base_name}" in
+      isolinux.bin|vesamenu.c32)
+        local asset_path
+        asset_path="$(find_syslinux_asset "${base_name}")" || {
+          printf 'Unable to locate required syslinux asset for local bootloader dir: %s\n' "${base_name}" >&2
+          exit 1
+        }
+        cp -f "${asset_path}" "${bootloader_dir}/${base_name}"
+        ;;
+
+      *)
+        if [[ -L "${candidate}" ]]; then
+          cp -fL "${candidate}" "${bootloader_dir}/${base_name}"
+        else
+          cp -f "${candidate}" "${bootloader_dir}/${base_name}"
+        fi
+        ;;
+    esac
+  done < <(find "${template_dir}" -mindepth 1 -maxdepth 1 \( -type f -o -type l \) -print0)
+
+  if [[ ! -f "${bootloader_dir}/isolinux.bin" ]]; then
+    printf 'Local bootloader dir is missing isolinux.bin: %s\n' "${bootloader_dir}" >&2
+    exit 1
+  fi
+
+  if [[ ! -f "${bootloader_dir}/vesamenu.c32" ]]; then
+    printf 'Local bootloader dir is missing vesamenu.c32: %s\n' "${bootloader_dir}" >&2
+    exit 1
+  fi
+
+  ls -lh "${bootloader_dir}"
+}
+
 apply_syslinux_theme_workaround() {
   local syslinux_theme="${COLIN_SYSLINUX_THEME:-live-build}"
   local config_file
@@ -269,6 +391,7 @@ main() {
 
   apply_syslinux_theme_workaround
   patch_live_build_syslinux_helpers
+  prepare_local_syslinux_bootloader_dir
   prepare_syslinux_compat_paths
 
   lb build 2>&1 | tee "${build_log}"
