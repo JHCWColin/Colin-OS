@@ -213,7 +213,7 @@ patch_live_build_syslinux_helpers() {
         printf 'Patched live-build syslinux helper: %s\n' "${candidate}"
         patched=1
       fi
-    done < <(find "${search_dir}" -type f \( -name '*syslinux*' -o -name '*isolinux*' \) -print0)
+    done < <(find "${search_dir}" -type f \( -name '*syslinux*' -o -name '*isolinux*' -o -name 'lb_binary_iso' \) -print0)
   done
 
   if [[ "${patched}" -eq 0 ]]; then
