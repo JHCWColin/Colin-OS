@@ -28,7 +28,7 @@ jobs:
         run: sudo -E bash build/build.sh "${COLIN_VERSION}"
 
       - name: Package release assets
-        run: bash build/package-release-assets.sh
+        run: sudo -E bash build/package-release-assets.sh
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v7
