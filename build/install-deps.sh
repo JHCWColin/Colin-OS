@@ -40,7 +40,7 @@ patch_live_build_syslinux() {
     [[ -d "${search_dir}" ]] || continue
 
     while IFS= read -r -d '' candidate; do
-      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -q 'Check_package chroot/usr/bin/isohybrid syslinux' "${candidate}"; then
+      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -Eq 'Check_package chroot/usr/bin/isohybrid[[:space:]]+syslinux$' "${candidate}"; then
         sed -i 's|Check_package chroot/usr/bin/isohybrid syslinux|Check_package chroot/usr/bin/isohybrid syslinux-utils|g' "${candidate}"
         printf 'Patched live-build isohybrid package mapping in %s\n' "${candidate}"
         patched=1
@@ -72,7 +72,7 @@ patch_live_build_syslinux() {
     [[ -d "${search_dir}" ]] || continue
 
     while IFS= read -r -d '' candidate; do
-      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -q 'Check_package chroot/usr/bin/isohybrid syslinux' "${candidate}"; then
+      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -Eq 'Check_package chroot/usr/bin/isohybrid[[:space:]]+syslinux$' "${candidate}"; then
         printf 'WARNING: live-build ISO helper still maps isohybrid to syslinux: %s\n' "${candidate}" >&2
         printf 'This may break iso-hybrid builds inside chroot.\n' >&2
       fi
