@@ -381,9 +381,10 @@ main() {
 
   local image_name="Colin-OS-${COLIN_VERSION}-amd64"
   local build_log="${LOG_DIR}/lb-build-${COLIN_VERSION}.log"
-  local iso_path="${WORKSPACE_DIR}/live-image-amd64.hybrid.iso"
   local output_iso="${ISO_DIR}/${image_name}.iso"
   local checksum_file="${ISO_DIR}/${image_name}.sha256"
+  local iso_path=""
+  local iso_candidate
 
   pushd "${WORKSPACE_DIR}" >/dev/null
 
@@ -419,9 +420,20 @@ main() {
 
   lb build 2>&1 | tee "${build_log}"
 
-  if [[ ! -f "${iso_path}" ]]; then
+  for iso_candidate in \
+    "${WORKSPACE_DIR}/binary.hybrid.iso" \
+    "${WORKSPACE_DIR}/live-image-amd64.hybrid.iso"; do
+    if [[ -f "${iso_candidate}" ]]; then
+      iso_path="${iso_candidate}"
+      break
+    fi
+  done
+
+  if [[ -z "${iso_path}" ]]; then
     popd >/dev/null
-    printf 'Expected ISO not found at %s\n' "${iso_path}" >&2
+    printf 'Expected ISO not found. Checked paths:\n' >&2
+    printf '  - %s\n' "${WORKSPACE_DIR}/binary.hybrid.iso" >&2
+    printf '  - %s\n' "${WORKSPACE_DIR}/live-image-amd64.hybrid.iso" >&2
     exit 1
   fi
 
