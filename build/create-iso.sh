@@ -98,6 +98,23 @@ find_syslinux_asset() {
       dpkg_pattern='vesamenu\.c32$'
       ;;
 
+    ldlinux.c32|libcom32.c32|libutil.c32|libmenu.c32|menu.c32)
+      for candidate in \
+        "/usr/share/live/build/bootloaders/isolinux/${asset_name}" \
+        "/usr/lib/syslinux/modules/bios/${asset_name}" \
+        "/usr/lib/syslinux/${asset_name}" \
+        "/usr/lib/SYSLINUX/${asset_name}" \
+        "/usr/lib/ISOLINUX/${asset_name}"; do
+        if [[ -f "${candidate}" ]]; then
+          printf '%s\n' "${candidate}"
+          return 0
+        fi
+      done
+
+      dpkg_package="syslinux-common"
+      dpkg_pattern="${asset_name//./\\.}$"
+      ;;
+
     *)
       printf 'Unsupported syslinux asset lookup: %s\n' "${asset_name}" >&2
       return 1
@@ -120,6 +137,7 @@ prepare_local_syslinux_bootloader_dir() {
   local template_dir
   local bootloader_dir="${WORKSPACE_DIR}/config/bootloaders/isolinux"
   local candidate
+  local asset_name
 
   template_dir="$(resolve_live_build_isolinux_template_dir)"
 
@@ -152,15 +170,35 @@ prepare_local_syslinux_bootloader_dir() {
     esac
   done < <(find "${template_dir}" -mindepth 1 -maxdepth 1 \( -type f -o -type l \) -print0)
 
-  if [[ ! -f "${bootloader_dir}/isolinux.bin" ]]; then
-    printf 'Local bootloader dir is missing isolinux.bin: %s\n' "${bootloader_dir}" >&2
-    exit 1
-  fi
+  for asset_name in \
+    "isolinux.bin" \
+    "ldlinux.c32" \
+    "vesamenu.c32" \
+    "libcom32.c32" \
+    "libutil.c32" \
+    "libmenu.c32" \
+    "menu.c32"; do
+    local asset_path
+    asset_path="$(find_syslinux_asset "${asset_name}")" || {
+      printf 'Unable to locate required syslinux asset for ISO bootloader dir: %s\n' "${asset_name}" >&2
+      exit 1
+    }
+    cp -f "${asset_path}" "${bootloader_dir}/${asset_name}"
+  done
 
-  if [[ ! -f "${bootloader_dir}/vesamenu.c32" ]]; then
-    printf 'Local bootloader dir is missing vesamenu.c32: %s\n' "${bootloader_dir}" >&2
-    exit 1
-  fi
+  for asset_name in \
+    "isolinux.bin" \
+    "ldlinux.c32" \
+    "vesamenu.c32" \
+    "libcom32.c32" \
+    "libutil.c32" \
+    "libmenu.c32" \
+    "menu.c32"; do
+    if [[ ! -f "${bootloader_dir}/${asset_name}" ]]; then
+      printf 'Local bootloader dir is missing %s: %s\n' "${asset_name}" "${bootloader_dir}" >&2
+      exit 1
+    fi
+  done
 
   ls -lh "${bootloader_dir}"
 }
@@ -310,14 +348,12 @@ prepare_syslinux_compat_paths() {
   fi
 
   # Copy all other necessary syslinux modules
-  local source_dir=""
   for candidate in \
     "/usr/share/live/build/bootloaders/isolinux" \
     "/usr/lib/syslinux/modules/bios" \
     "/usr/lib/ISOLINUX"; do
     if [[ -d "${candidate}" ]]; then
       printf 'Copying additional modules from: %s\n' "${candidate}"
-      source_dir="${candidate}"
       while IFS= read -r -d '' path; do
         local basename_file
         basename_file="$(basename "${path}")"
@@ -326,7 +362,6 @@ prepare_syslinux_compat_paths() {
         cp -f "${path}" "${host_compat_dir}/${basename_file}"
         cp -f "${path}" "${chroot_compat_dir}/${basename_file}"
       done < <(find "${candidate}" -maxdepth 1 -type f \( -name '*.c32' -o -name '*.bin' \) -print0)
-      break
     fi
   done
 
