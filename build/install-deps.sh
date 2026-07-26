@@ -40,6 +40,12 @@ patch_live_build_syslinux() {
     [[ -d "${search_dir}" ]] || continue
 
     while IFS= read -r -d '' candidate; do
+      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -q 'Check_package chroot/usr/bin/isohybrid syslinux' "${candidate}"; then
+        sed -i 's|Check_package chroot/usr/bin/isohybrid syslinux|Check_package chroot/usr/bin/isohybrid syslinux-utils|g' "${candidate}"
+        printf 'Patched live-build isohybrid package mapping in %s\n' "${candidate}"
+        patched=1
+      fi
+
       if [[ "$(basename "${candidate}")" == "lb_binary_syslinux" ]] && grep -q 'binary/live/vmlinuz-' "${candidate}"; then
         sed -i 's|binary/live/|binary/casper/|g' "${candidate}"
         printf 'Patched live-build casper kernel path handling in %s\n' "${candidate}"
@@ -66,6 +72,11 @@ patch_live_build_syslinux() {
     [[ -d "${search_dir}" ]] || continue
 
     while IFS= read -r -d '' candidate; do
+      if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -q 'Check_package chroot/usr/bin/isohybrid syslinux' "${candidate}"; then
+        printf 'WARNING: live-build ISO helper still maps isohybrid to syslinux: %s\n' "${candidate}" >&2
+        printf 'This may break iso-hybrid builds inside chroot.\n' >&2
+      fi
+
       if [[ "$(basename "${candidate}")" == "lb_binary_syslinux" ]] && grep -q 'binary/live/vmlinuz-' "${candidate}"; then
         printf 'WARNING: live-build syslinux helper still contains binary/live kernel paths: %s\n' "${candidate}" >&2
         printf 'This may break Ubuntu/casper ISO builds.\n' >&2
@@ -75,7 +86,7 @@ patch_live_build_syslinux() {
         printf 'WARNING: live-build syslinux helper still contains /root/isolinux: %s\n' "${candidate}" >&2
         printf 'This may cause build failures.\n' >&2
       fi
-    done < <(find "${search_dir}" -type f \( -name '*syslinux*' -o -name '*isolinux*' \) -print0)
+    done < <(find "${search_dir}" -type f \( -name '*syslinux*' -o -name '*isolinux*' -o -name 'lb_binary_iso' \) -print0)
   done
 }
 
