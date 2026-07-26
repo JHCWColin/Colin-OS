@@ -126,6 +126,20 @@ stage_branding_assets() {
   fi
 }
 
+stage_gfxboot_assets() {
+  local bootlogo_source="/usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz"
+  local bootlogo_dir="${CHROOT_INCLUDE_DIR}/usr/share/gfxboot-theme-ubuntu"
+
+  if [[ ! -f "${bootlogo_source}" ]]; then
+    printf 'Missing required gfxboot asset: %s\n' "${bootlogo_source}" >&2
+    printf 'Run build/install-deps.sh before building the ISO.\n' >&2
+    exit 1
+  fi
+
+  mkdir -p "${bootlogo_dir}"
+  cp -f "${bootlogo_source}" "${bootlogo_dir}/bootlogo.tar.gz"
+}
+
 stage_live_build_inputs() {
   copy_tree_contents "${DESKTOP_CHROOT_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}"
   copy_tree_contents "${DESKTOP_BINARY_SOURCE_DIR}" "${BINARY_INCLUDE_DIR}"
@@ -170,6 +184,7 @@ main() {
   write_metadata "${version}"
   stage_live_build_inputs
   stage_branding_assets
+  stage_gfxboot_assets
   copy_tree_contents "${ASSETS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/assets"
   copy_tree_contents "${APPS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/apps"
   fix_permissions
