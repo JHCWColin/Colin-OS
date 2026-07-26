@@ -163,6 +163,36 @@ stage_gfxboot_assets() {
   cp -f "${bootlogo_source}" "${bootlogo_dir}/bootlogo.tar.gz"
 }
 
+stage_rsvg_compat_wrapper() {
+  local wrapper_path="${CHROOT_INCLUDE_DIR}/usr/local/bin/rsvg"
+
+  mkdir -p "$(dirname "${wrapper_path}")"
+
+  cat > "${wrapper_path}" <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "${1:-}" == "--format" && $# -ge 7 ]]; then
+  format="$2"
+  shift 2
+
+  passthrough_args=()
+  while [[ $# -gt 2 ]]; do
+    passthrough_args+=("$1" "$2")
+    shift 2
+  done
+
+  input_file="$1"
+  output_file="$2"
+
+  exec rsvg-convert --format "${format}" "${passthrough_args[@]}" --output "${output_file}" "${input_file}"
+fi
+
+exec rsvg-convert "$@"
+EOF
+}
+
 stage_live_build_inputs() {
   copy_tree_contents "${DESKTOP_CHROOT_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}"
   copy_tree_contents "${DESKTOP_BINARY_SOURCE_DIR}" "${BINARY_INCLUDE_DIR}"
@@ -183,7 +213,8 @@ fix_permissions() {
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-welcome" \
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-settings" \
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-update-center" \
-    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-toolbox"; do
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-toolbox" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/rsvg"; do
     [[ -e "${file}" ]] || continue
     chmod 0755 "${file}"
   done
@@ -208,6 +239,7 @@ main() {
   stage_live_build_inputs
   stage_branding_assets
   stage_gfxboot_assets
+  stage_rsvg_compat_wrapper
   copy_tree_contents "${ASSETS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/assets"
   copy_tree_contents "${APPS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/apps"
   fix_permissions
