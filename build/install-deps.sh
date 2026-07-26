@@ -187,7 +187,6 @@ apt-get install -y \
   debootstrap \
   xorriso \
   squashfs-tools \
-  gfxboot-theme-ubuntu \
   grub-pc-bin \
   grub-efi-amd64-bin \
   mtools \

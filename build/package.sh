@@ -129,10 +129,33 @@ stage_branding_assets() {
 stage_gfxboot_assets() {
   local bootlogo_source="/usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz"
   local bootlogo_dir="${CHROOT_INCLUDE_DIR}/usr/share/gfxboot-theme-ubuntu"
+  local bootlogo_cache_dir="${WORK_ROOT}/gfxboot-theme-ubuntu"
+  local bootlogo_cache_deb="${bootlogo_cache_dir}/gfxboot-theme-ubuntu_0.23.3_amd64.deb"
+  local bootlogo_cache_extract_dir="${bootlogo_cache_dir}/extract"
+  local bootlogo_archive_url="http://archive.ubuntu.com/ubuntu/pool/main/g/gfxboot-theme-ubuntu/gfxboot-theme-ubuntu_0.23.3_amd64.deb"
 
   if [[ ! -f "${bootlogo_source}" ]]; then
-    printf 'Missing required gfxboot asset: %s\n' "${bootlogo_source}" >&2
-    printf 'Run build/install-deps.sh before building the ISO.\n' >&2
+    printf 'Host gfxboot asset not present, downloading archived package: %s\n' "${bootlogo_archive_url}"
+    mkdir -p "${bootlogo_cache_dir}"
+
+    if command -v curl >/dev/null 2>&1; then
+      curl -fsSL "${bootlogo_archive_url}" -o "${bootlogo_cache_deb}"
+    elif command -v wget >/dev/null 2>&1; then
+      wget -O "${bootlogo_cache_deb}" "${bootlogo_archive_url}"
+    else
+      printf 'Missing downloader for gfxboot asset retrieval. Install curl or wget.\n' >&2
+      exit 1
+    fi
+
+    rm -rf "${bootlogo_cache_extract_dir}"
+    mkdir -p "${bootlogo_cache_extract_dir}"
+    dpkg-deb -x "${bootlogo_cache_deb}" "${bootlogo_cache_extract_dir}"
+
+    bootlogo_source="${bootlogo_cache_extract_dir}/usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz"
+  fi
+
+  if [[ ! -f "${bootlogo_source}" ]]; then
+    printf 'Missing required gfxboot asset after retrieval attempt: %s\n' "${bootlogo_source}" >&2
     exit 1
   fi
 
