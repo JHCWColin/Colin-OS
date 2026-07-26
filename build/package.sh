@@ -18,6 +18,8 @@ DESKTOP_SOURCE_DIR="${REPO_ROOT}/configs/desktop"
 BRANDING_SOURCE_DIR="${REPO_ROOT}/configs/branding"
 ASSETS_SOURCE_DIR="${REPO_ROOT}/assets"
 APPS_SOURCE_DIR="${REPO_ROOT}/apps"
+APPIMAGE_CACHE_DIR="${WORK_ROOT}/downloads/appimages"
+APPIMAGE_TARGET_DIR="${CHROOT_INCLUDE_DIR}/opt/colinos/appimages"
 DESKTOP_CHROOT_SOURCE_DIR="${DESKTOP_SOURCE_DIR}/includes.chroot"
 DESKTOP_BINARY_SOURCE_DIR="${DESKTOP_SOURCE_DIR}/includes.binary"
 DESKTOP_INSTALLER_SOURCE_DIR="${DESKTOP_SOURCE_DIR}/includes.installer"
@@ -26,6 +28,8 @@ BRANDING_CHROOT_SOURCE_DIR="${BRANDING_SOURCE_DIR}/includes.chroot"
 BRANDING_BINARY_SOURCE_DIR="${BRANDING_SOURCE_DIR}/includes.binary"
 BRANDING_INSTALLER_SOURCE_DIR="${BRANDING_SOURCE_DIR}/includes.installer"
 BRANDING_HOOK_SOURCE_DIR="${BRANDING_SOURCE_DIR}/hooks"
+readonly AICHAT_UI_URL="https://github.com/JHCWColin/AIChat-UI/releases/download/V4.4.3/AIUI-4.4.3.AppImage"
+readonly ELECTRON_BUILDER_UI_URL="https://github.com/JHCWColin/electron-builder-gui/releases/download/V0.1.3/electron-builder-ui-0.1.3.AppImage"
 
 resolve_version() {
   if [[ -n "${COLIN_VERSION:-}" ]]; then
@@ -39,6 +43,26 @@ resolve_version() {
   fi
 
   printf '%s\n' "0.1.0-dev"
+}
+
+download_file() {
+  local url="$1"
+  local target_path="$2"
+
+  mkdir -p "$(dirname "${target_path}")"
+
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --retry 3 --retry-delay 2 "${url}" -o "${target_path}"
+    return
+  fi
+
+  if command -v wget >/dev/null 2>&1; then
+    wget -O "${target_path}" "${url}"
+    return
+  fi
+
+  printf 'Missing downloader for %s. Install curl or wget.\n' "${url}" >&2
+  exit 1
 }
 
 copy_tree_contents() {
@@ -193,6 +217,20 @@ exec rsvg-convert "$@"
 EOF
 }
 
+stage_preinstalled_appimages() {
+  local appimage_url="$1"
+  local runtime_name="$2"
+  local cached_path="${APPIMAGE_CACHE_DIR}/${runtime_name}"
+  local target_path="${APPIMAGE_TARGET_DIR}/${runtime_name}"
+
+  printf 'Downloading preinstalled AppImage: %s\n' "${appimage_url}"
+  download_file "${appimage_url}" "${cached_path}"
+
+  mkdir -p "${APPIMAGE_TARGET_DIR}"
+  cp -f "${cached_path}" "${target_path}"
+  chmod 0755 "${target_path}"
+}
+
 stage_live_build_inputs() {
   copy_tree_contents "${DESKTOP_CHROOT_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}"
   copy_tree_contents "${DESKTOP_BINARY_SOURCE_DIR}" "${BINARY_INCLUDE_DIR}"
@@ -214,7 +252,11 @@ fix_permissions() {
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-settings" \
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-update-center" \
     "${CHROOT_INCLUDE_DIR}/usr/local/bin/colin-toolbox" \
-    "${CHROOT_INCLUDE_DIR}/usr/local/bin/rsvg"; do
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/aichat-ui" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/electron-builder-ui" \
+    "${CHROOT_INCLUDE_DIR}/usr/local/bin/rsvg" \
+    "${APPIMAGE_TARGET_DIR}/aichat-ui.AppImage" \
+    "${APPIMAGE_TARGET_DIR}/electron-builder-ui.AppImage"; do
     [[ -e "${file}" ]] || continue
     chmod 0755 "${file}"
   done
@@ -242,6 +284,8 @@ main() {
   stage_rsvg_compat_wrapper
   copy_tree_contents "${ASSETS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/assets"
   copy_tree_contents "${APPS_SOURCE_DIR}" "${CHROOT_INCLUDE_DIR}/opt/colinos/apps"
+  stage_preinstalled_appimages "${AICHAT_UI_URL}" "aichat-ui.AppImage"
+  stage_preinstalled_appimages "${ELECTRON_BUILDER_UI_URL}" "electron-builder-ui.AppImage"
   fix_permissions
 
   cat > "${WORKSPACE_DIR}/build.env" <<EOF

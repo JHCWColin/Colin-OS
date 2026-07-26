@@ -210,6 +210,7 @@ apt-get install -y \
   debootstrap \
   xorriso \
   squashfs-tools \
+  p7zip-full \
   grub-pc-bin \
   grub-efi-amd64-bin \
   mtools \

@@ -5,3 +5,7 @@ chmod 0755 /usr/local/bin/colin-welcome
 chmod 0755 /usr/local/bin/colin-settings
 chmod 0755 /usr/local/bin/colin-update-center
 chmod 0755 /usr/local/bin/colin-toolbox
+chmod 0755 /usr/local/bin/aichat-ui
+chmod 0755 /usr/local/bin/electron-builder-ui
+chmod 0755 /opt/colinos/appimages/aichat-ui.AppImage
+chmod 0755 /opt/colinos/appimages/electron-builder-ui.AppImage

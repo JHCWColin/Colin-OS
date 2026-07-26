@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Electron Builder UI
+Comment=Launch the bundled electron-builder GUI AppImage
+Exec=electron-builder-ui
+Icon=applications-development
+Terminal=false
+Categories=Development;Utility;
+StartupNotify=true

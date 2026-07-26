@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=AIChat UI
+Comment=Launch the bundled AIChat UI AppImage
+Exec=aichat-ui
+Icon=internet-chat
+Terminal=false
+Categories=Network;Chat;
+StartupNotify=true

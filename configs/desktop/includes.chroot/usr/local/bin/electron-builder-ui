@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+exec env APPIMAGE_EXTRACT_AND_RUN=1 /opt/colinos/appimages/electron-builder-ui.AppImage "$@"
