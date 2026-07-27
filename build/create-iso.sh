@@ -240,6 +240,12 @@ patch_live_build_syslinux_helpers() {
         patched=1
       fi
 
+      if [[ "$(basename "${candidate}")" == "lb_binary_syslinux" ]] && grep -q 'binary/live/vmlinuz-' "${candidate}"; then
+        sed -i 's|binary/live/|binary/casper/|g' "${candidate}"
+        printf 'Patched live-build casper kernel path helper: %s\n' "${candidate}"
+        patched=1
+      fi
+
       if grep -q '/root/isolinux' "${candidate}"; then
         sed -i "s|/root/isolinux|${replacement_dir//|/\\|}|g" "${candidate}"
         printf 'Patched live-build syslinux helper: %s\n' "${candidate}"
@@ -260,6 +266,11 @@ patch_live_build_syslinux_helpers() {
     while IFS= read -r -d '' candidate; do
       if [[ "$(basename "${candidate}")" == "lb_binary_iso" ]] && grep -Eq 'Check_package chroot/usr/bin/isohybrid[[:space:]]+syslinux$' "${candidate}"; then
         printf 'live-build ISO helper still maps isohybrid to syslinux: %s\n' "${candidate}" >&2
+        exit 1
+      fi
+
+      if [[ "$(basename "${candidate}")" == "lb_binary_syslinux" ]] && grep -q 'binary/live/vmlinuz-' "${candidate}"; then
+        printf 'live-build syslinux helper still contains binary/live kernel paths: %s\n' "${candidate}" >&2
         exit 1
       fi
 
